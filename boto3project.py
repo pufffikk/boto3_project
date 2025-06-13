@@ -28,3 +28,18 @@ for sid in [pub1, pub2]:
     ec2.modify_subnet_attribute(SubnetId=sid, MapPublicIpOnLaunch={"Value": True})
 
 logging.info(f"Subnets with ids {pub1, pub2, priv1, priv2} were created")
+
+igw_id = ec2.create_internet_gateway()["InternetGateway"]["InternetGatewayId"]
+ec2.create_tags(Resources=[igw_id], Tags=[{"Key": "Name", "Value": "Script-IGW"}])
+ec2.attach_internet_gateway(InternetGatewayId=igw_id, VpcId=vpc_id)
+
+logging.info(f"Internet getaway with id {igw_id} was created")
+
+rtb_id = ec2.create_route_table(VpcId=vpc_id)["RouteTable"]["RouteTableId"]
+ec2.create_tags(Resources=[rtb_id], Tags=[{"Key": "Name", "Value": "Public Route Table"}])
+ec2.create_route(RouteTableId=rtb_id, DestinationCidrBlock="0.0.0.0/0", GatewayId=igw_id)
+
+for sid in [pub1, pub2]:
+    ec2.associate_route_table(RouteTableId=rtb_id, SubnetId=sid)
+
+logging.info(f"Public Rout table with id {rtb_id} was created")
