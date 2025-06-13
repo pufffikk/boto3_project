@@ -164,11 +164,3 @@ ec2.run_instances(
 )
 
 logging.info("Bastion EC2 instance launched.")
-
-response = rds.describe_db_instances(DBInstanceIdentifier="your-db-id")
-
-endpoint = response["DBInstances"][0]["Endpoint"]["Address"]
-port = response["DBInstances"][0]["Endpoint"]["Port"]
-
-print(f"Endpoint: {endpoint}")
-print(f"Port: {port}")
